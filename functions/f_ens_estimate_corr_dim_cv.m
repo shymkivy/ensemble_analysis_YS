@@ -76,10 +76,8 @@ for n_cv = 1:kFold
     %fac_sm(n_cv) = fac1;
 end
 
-accuracy.train_err = mean(train_err);
-accuracy.train_err_sm = mean(train_err_sm);
-accuracy.test_err = mean(test_err);
-accuracy.test_err_sm = mean(test_err_sm);
-accuracy.fac_sm = mean(fac_sm);
-accuracy.fac = mean(fac);
+accuracy.train_err = nanmean(train_err);
+accuracy.train_err_sm = nanmean(train_err_sm);
+accuracy.test_err = nanmean(test_err);
+accuracy.test_err_sm = nanmean(test_err_sm);
 end
