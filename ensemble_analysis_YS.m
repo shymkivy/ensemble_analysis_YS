@@ -54,7 +54,7 @@ if estimate_params
         firing_rate_norm = f_normalize(firing_rate, est_params.normalize);
 
         params1 = est_params_list(n_par);
-        params1.vol_period = 1/frame_rate;
+        params1.vol_period = 1/frame_rate*1000;
         accuracy = f_ens_estimate_corr_dim_cv(firing_rate_norm, params1);
 
         temp_fields = fields(accuracy);
@@ -72,7 +72,7 @@ if estimate_params
 end
 
 %% Smooth data
-firing_rate_sm = f_smooth_gauss(firing_rate, ens_params.smooth_SD*frame_rate);
+firing_rate_sm = f_smooth_gauss(firing_rate, ens_params.smooth_SD*frame_rate/1000);
 
 %% extract ensambles
 disp('Extracting ensambles...');
@@ -84,7 +84,7 @@ title('raster cell sorted');
 for n_comp = 1:numel(ens_out.cells.ens_list)
     cells1 = ens_out.cells.ens_list{n_comp};
     trials1 = ens_out.trials.ens_list{n_comp};
-    scores1 = ens_out.scores(ens_out.cells.scores_alignment(n_comp),:);
+    scores1 = ens_out.scores;
 
     f_plot_ensamble_deets(firing_rate_sm, cells1, trials1, scores1);
     title([ens_params.ensamble_method ' ensamble ' num2str(n_comp)]);
