@@ -3,7 +3,7 @@ ensamble_method = f_get_param(params, 'ensamble_method', 'nmf');
 ensamble_extraction_thresh = f_get_param(params, 'ensamble_extraction_thresh', 'shuff'); % 'signal_z' 'shuff' 'signal_clust_thresh'
 plot_stuff = f_get_param(params, 'plot_stuff', 0);
 
-thresh_percent = 99;
+thresh_percent = 95;
 shuff_rep = 50; 
 z_thresh = 2;
 

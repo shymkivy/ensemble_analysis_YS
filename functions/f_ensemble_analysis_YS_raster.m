@@ -5,12 +5,14 @@ if ~exist('params', 'var') || ~isstruct(params)
     params = struct;
 end
 
-normalize1 = f_get_param(params, 'normalize', 'norm_mean'); % 'norm_full', 'norm_mean' 'none'
+normalize1 = f_get_param(params, 'normalize', 'norm_mean_std'); % 'norm_mean_std', 'norm_mean' 'none'
 shuffle_method = f_get_param(params, 'shuffle_method', 'circ_shift');     % 'circ_shift' or 'scramble'
 total_dim_thresh = f_get_param(params, 'total_dim_thresh', .7);
-ensamble_method = f_get_param(params, 'ensamble_method', 'nmf'); % 'PCA', 'AV', 'ICA', 'NMF', 'SPCA', 'tca', 'fa', 'gpfa'
+ensamble_method = f_get_param(params, 'method', 'nmf'); % 'PCA', 'AV', 'ICA', 'NMF', 'SPCA', 'tca', 'fa', 'gpfa'
 ensamble_extraction = f_get_param(params, 'ensamble_extraction', 'thresh'); % clust 'thresh'
-plot_stuff = f_get_param(params, 'plot_stuff', 0);
+plot_stuff = f_get_param(params, 'plot_stuff');
+
+num_comps = f_get_param(params, 'num_comps');
 
 %%
 ndims1 = ndims(firing_rate);
@@ -22,15 +24,7 @@ end
 active_cells = sum(firing_rate,2) > 0;
 firing_rate(~active_cells,:) = [];
 
-if strcmpi(normalize1, 'norm_full')
-    firing_rate_norm = firing_rate - mean(firing_rate,2);
-    firing_rate_norm = firing_rate_norm./std(firing_rate_norm,[],2); 
-    %firing_rate_cont(isnan(firing_rate_cont)) = 0;
-elseif strcmpi(normalize1, 'norm_mean')
-    firing_rate_norm = firing_rate - mean(firing_rate,2);
-elseif strcmpi(normalize1, 'none')
-    firing_rate_norm = firing_rate;
-end
+firing_rate_norm = f_normalize(firing_rate, normalize1);
 
 [num_cells, num_T] = size(firing_rate_norm);
 
@@ -73,7 +67,9 @@ dimensionality_total_norm_shuff = mean(dim_total_shuff);
 
 dimensionality_corr = mean(sum(d_explained>max_lamb_shuff'));
 
-num_comps = ceil(dimensionality_corr);
+if isempty(num_comps)
+    num_comps = ceil(dimensionality_corr);
+end
 
 ens_out.dimensionality_total = dimensionality_total;
 ens_out.dimensionality_first_comp_size = d_explained2(1);
@@ -107,6 +103,8 @@ hclust_out_cell = f_hcluster_wrap(d_score_norm, hc_params);
 hclust_out_tr = f_hcluster_wrap(d_coeff(:,n_comp), hc_params);
 ord_cell = hclust_out_cell.dend_order;
 ord_tr = hclust_out_tr.dend_order;
+ens_out.ord_cell = ord_cell;
+ens_out.ord_tr = ord_tr;
 
 %% real data 
 if num_comps > 0
@@ -132,16 +130,16 @@ if num_comps > 0
     elseif strcmpi(ensamble_extraction, 'thresh')
         [thresh_coeffs, thresh_scores] = f_ens_get_thresh(firing_rate_ensemb, coeffs, scores, num_ens_comps, params);
         ens_out1 = f_ensemble_apply_thresh(coeffs, scores, thresh_coeffs, thresh_scores, num_ens_comps);
-        ens_out.cells = ens_out1.cells;
-        ens_out.trials = ens_out1.trials;
     end
+    ens_out.cells = ens_out1.cells;
+    ens_out.trials = ens_out1.trials;
 else
     ens_out.cells.clust_label = 0;
-    ens_out.cells.ens_list = {(1:num_cells)'};
+    ens_out.cells.residual_list = {(1:num_cells)'};
     ens_out.cells.clust_ident = zeros(num_cells,1);
     ens_out.cells.dend_order = ord_cell;
     ens_out.trials.clust_label = 0;
-    ens_out.trials.ens_list = {(1:num_T)'};
+    ens_out.trials.residual_list = {(1:num_T)'};
     ens_out.trials.clust_ident = zeros(num_trials,1);
     ens_out.trials.dend_order = ord_tr;
 end

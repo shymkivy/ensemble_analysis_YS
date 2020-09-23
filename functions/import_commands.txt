@@ -23,5 +23,8 @@ curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_ens_get_thresh.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_ensemble_apply_thresh.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_dred_test.m
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_raster_mean.m
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_trial_indicator3.m
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_align_comps_square.m
 
 ECHO Done

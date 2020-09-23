@@ -58,8 +58,6 @@ elseif strcmpi(cluster_method, 'gmm')
     [~, clust_out_tr.dend_order] = sort(clust_out_tr.clust_ident);
 end
 
-%% reoder to make core ens first
-
 clust_params_tr = if_get_clust_params(X, clust_out_tr);
 
 
@@ -153,13 +151,15 @@ elseif strcmpi(cluster_method_cell, 'gmm')
     [~, clust_out_cell.dend_order] = sort(clust_out_cell.clust_ident);
 end
 
+clust_params_cell = if_get_clust_params(X, clust_out_cell);
+
 %% align to trial clusts
 
-clust_params_cell = if_get_clust_params(X, clust_out_cell);
-clust_params_tr_al = if_align_clusters(coeffs, scores, clust_params_cell, clust_params_tr, plot_stuff);
 
-ens_out.cells = clust_params_cell;
-ens_out.trials = clust_params_tr_al;
+[cells_clust_al, trials_clust_al] = if_align_clusters(coeffs, scores, clust_params_cell, clust_params_tr, plot_stuff);
+
+ens_out.cells = cells_clust_al;
+ens_out.trials = trials_clust_al;
 
 %%
 if plot_stuff
@@ -199,60 +199,43 @@ end
 [~, ens_order2] = sort(ens_order);
 clust_ident2 = ens_order2(clust_out.clust_ident)-1;
 
-ens_list = cell(num_clust,1);
-for n_ens = 1:(num_clust)
-    ens_list{n_ens} = find(clust_ident2 == (n_ens-1)');
+ens_list = cell(num_clust-1,1);
+for n_ens = 1:(num_clust-1)
+    ens_list{n_ens} = find(clust_ident2 == (n_ens));
 end
 
-clust_params.num_clust = num_clust;
 clust_params.clust_label = clust_label - 1;
 clust_params.ens_list = ens_list;
+clust_params.residual_list = find(clust_ident2 == 0);
 clust_params.clust_ident = clust_ident2(:);
 clust_params.dend_order = clust_out.dend_order(:);
-clust_params.clust_centers = clust_centers(ens_order,:);
-clust_params.clust_mag = clust_mag(ens_order);
-clust_params.cell_num = cell_num(ens_order);
 end
 
-function align_clust_out = if_align_clusters(coeffs, scores, cells_clust, trials_clust, plot_stuff)
+function [cells_clust_al, trials_clust_al] = if_align_clusters(coeffs, scores, cells_clust, trials_clust, plot_stuff)
 
-dist_met_pre = zeros(numel(cells_clust.ens_list), numel(trials_clust.ens_list));
-for n_ens = 1:numel(cells_clust.ens_list)
-    for n_ens2 = 1:numel(trials_clust.ens_list)
-        cells1 = cells_clust.ens_list{n_ens};
-        trials1 = trials_clust.ens_list{n_ens2};
-        ens_mat = coeffs(cells1,:)*scores(:,trials1);
-        dist_met_pre(n_ens,n_ens2) = mean(ens_mat(:));
-    end   
+% first align cell lists to scores sequence
+ens_traces = zeros(size(scores));
+for n_ens1 = 1:numel(cells_clust.ens_list)
+    ens_traces(n_ens1,:) = mean(coeffs(cells_clust.ens_list{n_ens1},:)*scores);
 end
 
-all_perms = perms(1:cells_clust.num_clust);
-num_perms = size(all_perms,1);
-acc1 = zeros(num_perms,1);
-for n_pr = 1:num_perms
-    acc1(n_pr) = sum(diag(dist_met_pre(:,all_perms(n_pr,:))));
-end
-[~, max_perm_ind] = max(acc1);
-best_perm = all_perms(max_perm_ind,:);
+best_perm_cells = f_align_comps_square(scores, ens_traces);
+[~, best_perm_cells2] = sort(best_perm_cells);
 
-dist_met_post = dist_met_pre(:,best_perm);
-
-[~, best_perm2] = sort(best_perm);
-
-if plot_stuff
-    figure; 
-    subplot(1,2,1); imagesc(dist_met_pre);
-    title('Pre cluster alignment'); axis equal tight;
-    subplot(1,2,2); imagesc(dist_met_post)
-    title('Post cluster alignment'); axis equal tight;
+ens_popl = zeros(size(coeffs));
+for n_ens1 = 1:numel(trials_clust.ens_list)
+    ens_popl(:,n_ens1) = mean(coeffs*scores(:,trials_clust.ens_list{n_ens1}),2);
 end
 
-align_clust_out = trials_clust;
-clust_ident = best_perm2(trials_clust.clust_ident+1)-1;
-align_clust_out.ens_list = trials_clust.ens_list(best_perm);
-align_clust_out.clust_ident = clust_ident(:);
-align_clust_out.clust_centers = trials_clust.clust_centers(best_perm,:);
-align_clust_out.clust_mag = trials_clust.clust_mag(best_perm);
-align_clust_out.cell_num = trials_clust.cell_num(best_perm);
+best_perm_trials = f_align_comps_square(coeffs', ens_popl');
+[~, best_perm_trials2] = sort(best_perm_trials);
+
+cells_clust_al = cells_clust;
+cells_clust_al.ens_list = cells_clust.ens_list(best_perm_cells);
+cells_clust_al.clust_ident(cells_clust.clust_ident>0) = best_perm_cells2(cells_clust.clust_ident(cells_clust.clust_ident>0));
+
+trials_clust_al = trials_clust;
+trials_clust_al.ens_list = trials_clust.ens_list(best_perm_trials);
+trials_clust_al.clust_ident(trials_clust.clust_ident>0) = best_perm_trials2(trials_clust.clust_ident(trials_clust.clust_ident>0));
 end
 

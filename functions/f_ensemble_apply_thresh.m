@@ -43,10 +43,6 @@ for n_ens = 1:numel(ens_cells2)
     clust_ident_tr(ens_trials2{n_ens}) = n_ens;
 end
 
-ens_cells3 = [{find(clust_ident_cell == 0)}; ens_cells2];
-ens_trials3 = [{find(clust_ident_tr == 0)}; ens_trials2];
-
-
 % get sorting index for aethetics
 LR_raster = coeffs*scores;
 % sort raster so looks better
@@ -57,14 +53,16 @@ warning('off','all');
 [~, inx_tr] = sort(clust_ident_tr(dend_order_tr));
 
 cells.clust_label = unique(clust_ident_cell);
-cells.ens_list = ens_cells3;
+cells.ens_list = ens_cells2;
 cells.clust_ident = clust_ident_cell;
 cells.dend_order = dend_order_cell(inx_cell);
+cells.residual_list = find(clust_ident_cell == 0);
 
 trials.clust_label = unique(clust_ident_tr);
-trials.ens_list = ens_trials3;
+trials.ens_list = ens_trials2;
 trials.clust_ident = clust_ident_tr;
 trials.dend_order = dend_order_tr(inx_tr);
+trials.residual_list = find(clust_ident_tr == 0);
 
 ens_out.trials = trials;
 ens_out.cells = cells;
