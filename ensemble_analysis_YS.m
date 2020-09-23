@@ -13,8 +13,8 @@ frame_rate = 30;
 estimate_params = 0;    % do estimation?
 est_params.ensamble_method = 'nmf';              % options: svd, nmf, ica                % SVD is most optimal for encoding, NMF rotates components into something that is real and interpretable
 est_params.normalize = 'norm_mean_std'; % 'norm_mean_std', 'norm_mean' 'none'   % either way, need to normalize the power of signal in each cell, otherwise dimred will pull out individual cells
-est_params.smooth_SD = 100;       % range of values to estimate across    % larger window will capture 'sequences' of ensembles, if window is smaller than optimal, you will end up splitting those into more components
-est_params.num_comp = 2:4:5;               % range of values to estimate across    
+est_params.smooth_SD = 50:50:250;       % range of values to estimate across    % larger window will capture 'sequences' of ensembles, if window is smaller than optimal, you will end up splitting those into more components
+est_params.num_comp = 2:4:20;               % range of values to estimate across    
 est_params.shuffle_data_chunks = 0;   % 1 or 0, keeping cell correlations   % if the sequence of trial presentation contains information, you will need to shuffle. Also need to do in chunks because adjacent time bins are slightly correlated
 est_params.reps = 1;                   % how many repeats per param 
 
@@ -34,7 +34,7 @@ ens_params.ensamble_extraction = 'thresh'; %  'thresh'(for nmf) 'clust'(for svd)
 ens_params.ensamble_extraction_thresh = 'signal_z'; % 'shuff' 'signal_z' 'signal_clust_thresh'
 ens_params.signal_z_thresh = 2.5;
 ens_params.shuff_thresh_percent = 95;
-ens_params.plot_stuff = 0;
+ens_params.plot_stuff = 1;
 
 %% remove inactive cells
 
