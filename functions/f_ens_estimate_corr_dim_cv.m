@@ -3,7 +3,7 @@ if ~exist('params', 'var') || ~isstruct(params)
     params = struct;
 end
 kFold = f_get_param(params, 'KFold', 5);
-randomize_trials = f_get_param(params, 'randomize_trials', 1);
+shuffle_data_chunks = f_get_param(params, 'shuffle_data_chunks', 1);
 num_comp = f_get_param(params, 'num_comp');
 ensamble_method = f_get_param(params, 'ensamble_method', 'SVD');
 smooth_SD = f_get_param(params, 'smooth_SD', 'SVD');
@@ -19,10 +19,23 @@ if isempty(num_comp)
     num_comp = sum(cumsum(explained) < 10);
 end
 
-if randomize_trials
-    test_order = randperm(num_bins);
+
+if shuffle_data_chunks
+    chunk_size = ceil(num_bins/kFold/100);
+    chunk_idx = 0:(chunk_size):num_bins;
+    num_chunks = numel(chunk_idx)-1;
+    chunk_order = randperm(num_chunks);
+    test_order1 = (1:num_bins)';
+    test_order2 = reshape(test_order1(1:chunk_idx(end)), chunk_size, num_chunks);
+    test_order3 = test_order2(:,chunk_order);
+    test_orter4 = test_order3(:);
+    if chunk_idx(end) < num_bins
+        test_order = [test_orter4; test_order1((chunk_idx(end)+1):num_bins)];
+    else
+        test_order = test_orter4;
+    end
 else
-    test_order = 1:num_bins;
+    test_order = (1:num_bins)';
 end
 
 firing_rate_sm = f_smooth_gauss(firing_rate, smooth_SD/vol_period);
