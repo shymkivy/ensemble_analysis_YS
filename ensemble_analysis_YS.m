@@ -76,3 +76,16 @@ firing_rate_sm = f_smooth_gauss(firing_rate, ens_params.smooth_SD*frame_rate);
 
 %% extract ensambles
 ens_out = f_ensemble_analysis_YS_raster(firing_rate_sm, ens_params);
+
+
+f_plot_raster_mean(firing_rate_sm(ens_out.ord_cell,:), 1);
+title('raster cell sorted');
+
+for n_comp = 1:numel(ens_out.cells.ens_list)
+    cells1 = ens_out.cells.ens_list{n_comp};
+    trials1 = ens_out.trials.ens_list{n_comp};
+    scores1 = ens_out.scores(ens_out.cells.scores_alignment(n_comp),:);
+
+    f_plot_ensamble_deets(firing_rate_sm, cells1, trials1, scores1);
+    title([ens_params.ensamble_method ' ensamble ' num2str(n_comp)]);
+end
