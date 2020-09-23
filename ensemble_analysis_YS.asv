@@ -68,7 +68,7 @@ if estimate_params
 
     f_plot_cv_error_3D(est_params_list, 'smooth_SD', 'num_comp', 'test_err');
     ax1 = gca;
-    ax1.Title.String = sprintf('%s, dset%d; %s L2 error from raw, (%s)',cond_name,n_dset,est_params.ensamble_method, ax1.Title.String);          
+    ax1.Title.String = sprintf('%s, dset%d; %s L2 error from raw, (%s)',cond_name,n_dset,est_params.method, ax1.Title.String);          
 end
 
 %% Smooth data
