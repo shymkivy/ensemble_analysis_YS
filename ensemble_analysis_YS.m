@@ -1,5 +1,6 @@
 %% analyzing ensembles with NMF
-% load data into 'firing_rate' variable (cells x frames)
+% input: firing_rate (cells x frames)
+
 clear;
 close all;
 
@@ -64,11 +65,11 @@ if estimate_params
     end
     fprintf('\nDone\n');
     [~, min_ind] = min([est_params_list.test_err]);
-    fprintf('From provided range, optimal smooth_SD = %d; Number of CV %s num_comp = %d\n', est_params_list(min_ind).smooth_SD, est_params.method, est_params_list(min_ind).num_comp);
+    fprintf('From provided range, optimal smooth_SD = %d; Number of CV %s num_comp = %d\n', est_params_list(min_ind).smooth_SD, est_params.ensamble_method, est_params_list(min_ind).num_comp);
 
     f_plot_cv_error_3D(est_params_list, 'smooth_SD', 'num_comp', 'test_err');
     ax1 = gca;
-    ax1.Title.String = sprintf('%s, dset%d; %s L2 error from raw, (%s)',cond_name,n_dset,est_params.ensamble_method, ax1.Title.String);          
+    ax1.Title.String = sprintf('%s L2 error from raw, (%s)',est_params.ensamble_method, ax1.Title.String);          
 end
 
 %% Smooth data
