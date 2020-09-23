@@ -84,7 +84,7 @@ title('raster cell sorted');
 for n_comp = 1:numel(ens_out.cells.ens_list)
     cells1 = ens_out.cells.ens_list{n_comp};
     trials1 = ens_out.trials.ens_list{n_comp};
-    scores1 = ens_out.scores;
+    scores1 = ens_out.scores(n_comp,:);
 
     f_plot_ensamble_deets(firing_rate_sm, cells1, trials1, scores1);
     title([ens_params.ensamble_method ' ensamble ' num2str(n_comp)]);
