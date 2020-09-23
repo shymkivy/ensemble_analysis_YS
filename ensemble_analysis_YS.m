@@ -10,11 +10,11 @@ frame_rate = 30;
 %% input parameters for cross validation estimation of smooth window and number of correlated components / ensembles
 
 estimate_params = 0;    % do estimation?
-est_params.method = 'nmf';              % options: svd, nmf, ica                % SVD is most optimal for encoding, NMF rotates components into something that is real and interpretable
+est_params.ensamble_method = 'nmf';              % options: svd, nmf, ica                % SVD is most optimal for encoding, NMF rotates components into something that is real and interpretable
 est_params.normalize = 'norm_mean_std'; % 'norm_mean_std', 'norm_mean' 'none'   % either way, need to normalize the power of signal in each cell, otherwise dimred will pull out individual cells
-est_params.smooth_SD = [80:10:150];       % range of values to estimate across    % larger window will capture 'sequences' of ensembles, if window is smaller than optimal, you will end up splitting those into more components
-est_params.num_comp = [14];               % range of values to estimate across    
-est_params.randomize_data_chunks = 0;   % 1 or 0                                % if the sequence of trial presentation contains information, you will need to randomize. Also need t odo in chunks because adjacent time bins are slightly correlated
+est_params.smooth_SD = 80:10:150;       % range of values to estimate across    % larger window will capture 'sequences' of ensembles, if window is smaller than optimal, you will end up splitting those into more components
+est_params.num_comp = 2:4:20;               % range of values to estimate across    
+est_params.shuffle_data_chunks = 0;   % 1 or 0, keeping cell correlations   % if the sequence of trial presentation contains information, you will need to shuffle. Also need to do in chunks because adjacent time bins are slightly correlated
 est_params.reps = 2;                   % how many repeats per param 
 
 %%
@@ -22,20 +22,18 @@ est_params.n_rep = 1:est_params.reps;
 est_params_list = f_build_param_list(est_params, {'smooth_SD', 'num_comp', 'n_rep'});
 
 %% input paramseters for ensemble analysis
-% NMF ensemble detection is best
+% NMF ensemble detection is best with thresh extraction
 % for NMF best to use norm_rms(keep values positive), otherwise can also use norm_mean_std
-% NMF 14 comp
-% SVD 11-14 comp?
-ens_params.method = 'NMF'; % options: svd, nmf, ica     % here NMF is
-ens_params.num_comp = 14;
-ens_params.smooth_SD = 100; % 110 is better?
+
+ens_params.ensamble_method = 'nmf'; % options: svd, nmf, ica     % here NMF is
+ens_params.num_comp = 15;
+ens_params.smooth_SD = 120; % 110 is better?
 ens_params.normalize = 'norm_mean_std'; % 'norm_mean_std', 'norm_mean' 'none'
 ens_params.ensamble_extraction = 'thresh'; %  'thresh'(for nmf) 'clust'(for svd)
-ens_params.ensamble_extraction_thresh = 'shuff'; % 'shuff' 'signal_z' 'signal_clust_thresh'
-ens_params.plot_stuff = 1;
-
-%%
-vol_period = 1/frame_rate;
+ens_params.ensamble_extraction_thresh = 'signal_z'; % 'shuff' 'signal_z' 'signal_clust_thresh'
+ens_params.signal_z_thresh = 2.5;
+ens_params.shuff_thresh_percent = 95;
+ens_params.plot_stuff = 0;
 
 %% remove inactive cells
 
