@@ -53,7 +53,7 @@ if plot_dist_mat
     end
     imagesc(image_Z);
     %axis image;
-    title(sprintf('%s; %s hclust, %s dist',  title_tag, method, metric));
+    title(sprintf('%s %s hclust, %s dist',  title_tag, method, metric));
     caxis([0 1]);
     axis tight;
     axis equal;

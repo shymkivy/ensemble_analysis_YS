@@ -5,7 +5,7 @@ end
 kFold = f_get_param(params, 'KFold', 5);
 randomize_trials = f_get_param(params, 'randomize_trials', 1);
 num_comp = f_get_param(params, 'num_comp');
-method = f_get_param(params, 'method', 'SVD');
+ensamble_method = f_get_param(params, 'ensamble_method', 'SVD');
 smooth_SD = f_get_param(params, 'smooth_SD', 'SVD');
 vol_period = f_get_param(params, 'vol_period', 30);
 
@@ -38,7 +38,7 @@ for n_cv = 1:kFold
     
     yTrain = firing_rate(:,~test_gr);
     yTrain_sm = firing_rate_sm(:,~test_gr);
-    [dred_factors, ydred_data] = f_dred_train2(yTrain_sm, num_comp, method, 0);
+    [dred_factors, ydred_data] = f_dred_train2(yTrain_sm, num_comp, ensamble_method, 0);
     %train_err(n_cv) = norm(yTrain(:) - ydred_data(:))/norm(yTrain(:));
     %train_err_sm(n_cv) = norm(yTrain_sm(:) - ydred_data(:))/norm(yTrain_sm(:));
     train_err(n_cv) = norm(yTrain(:) - ydred_data(:))/numel(yTrain);
@@ -46,7 +46,7 @@ for n_cv = 1:kFold
     
     yTest = firing_rate(:,test_gr);
     yTest_sm = firing_rate_sm(:,test_gr);
-    Ycs = f_dred_test(yTest_sm, dred_factors.dred_factors, method);
+    Ycs = f_dred_test(yTest_sm, dred_factors.dred_factors, ensamble_method);
     %test_err(n_cv) = norm(yTest(:) - Ycs(:))/norm(yTest(:));
     %test_err_sm(n_cv) = norm(yTest_sm(:) - Ycs(:))/norm(yTest_sm(:));
      

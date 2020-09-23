@@ -16,6 +16,9 @@ elseif strcmpi(method, 'hammilarity')
     zero_diag_mat = 1 - diag(ones(size(SI_hamm,1),1));
     dist = squareform((1 - SI_hamm).*zero_diag_mat);
     Z = linkage(dist,'average'); % weighted
+elseif strcmpi(method, 'rbf')
+    dist = f_rbf_kernel(data, data);
+    Z = linkage(dist,'ward'); % weighted
 end
 
 

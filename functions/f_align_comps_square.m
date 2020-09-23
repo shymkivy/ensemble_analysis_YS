@@ -1,8 +1,7 @@
-function perm_out = f_align_comps_square(templ_comps, align_comps)
+function perm_out = f_align_comps_square(dist_mat_pre)
 
-dist_mat_pre = templ_comps*align_comps';
 [d1, d2] = size(dist_mat_pre);
-% figure; imagesc(dist_mat_pre);
+
 
 %% greedy algorithm for alignment?
 dist_mat_updated = dist_mat_pre;
@@ -11,7 +10,7 @@ zero_mask = ones(d1,d2);
 perm_col = 1:d1;
 col_complete = false(d1,1);
 n_itr = 0;
-while ~prod(col_complete)
+while ~prod(col_complete) && n_itr<10000
     n_itr = n_itr + 1;
     [~, max_ind] = max(dist_mat_max(:));
     [row,col] = ind2sub([d1 d2],max_ind);
@@ -34,10 +33,12 @@ while ~prod(col_complete)
     end
     dist_mat_max = dist_mat_pre(:,perm_col).*zero_mask;
 end
+% figure; imagesc(dist_mat_pre);
+% title('dist pre')
 % figure; imagesc(dist_mat_updated);
-% title([num2str(n_itr) ' iterations']);
-% final_score1 = sum(diag(dist_mat_pre(:,perm_col)));
+% title(['dist post; ' num2str(n_itr) ' iterations']);
 
+%final_score1 = sum(diag(dist_mat_pre(:,perm_col)));
 %% random perm
 % dist_mat_updated = dist_mat_pre;
 % col_range = 1:d1;
