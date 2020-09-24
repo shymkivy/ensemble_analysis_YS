@@ -19,7 +19,7 @@ if ~strcmpi(ensamble_method, 'nmf') && strcmpi(ensamble_extraction, 'thresh')
     ensamble_extraction = 'clust';
 end
 
-fprintf('Detecting ensembles with %s and thresh detection...\n',ensamble_method);
+fprintf('Detecting ensembles with %s and %s detection...\n',ensamble_method, ensamble_extraction);
 
 %%
 ndims1 = ndims(firing_rate);
@@ -134,13 +134,14 @@ if num_comp > 0
     ens_out.coeffs = coeffs;
     ens_out.scores = scores;
     %%
-
+    disp('Extraction...')
     if strcmpi(ensamble_extraction, 'clust')
         ens_out1 = f_ensemble_clust_cell(coeffs, scores, firing_rate_norm, params);
         %ens_out1 = f_ensemble_extract_clust(coeffs, scores, num_ens_comps, firing_rate_norm, params);
     elseif strcmpi(ensamble_extraction, 'thresh')
         [thresh_coeffs, thresh_scores] = f_ens_get_thresh(firing_rate_ensemb, coeffs, scores, num_ens_comps, params);
         ens_out1 = f_ensemble_apply_thresh(coeffs, scores, thresh_coeffs, thresh_scores, num_ens_comps);
+        ens_out1.cells.ens_scores = ens_out.scores;
     end
     ens_out.cells = ens_out1.cells;
     ens_out.trials = ens_out1.trials;
@@ -148,12 +149,16 @@ else
     ens_out.cells.clust_label = 0;
     ens_out.cells.residual_list = {(1:num_cells)'};
     ens_out.cells.clust_ident = zeros(num_cells,1);
-    ens_out.cells.dend_order = ord_cell;
     ens_out.trials.clust_label = 0;
     ens_out.trials.residual_list = {(1:num_T)'};
     ens_out.trials.clust_ident = zeros(num_trials,1);
+
+end
+ens_out.cells.dend_order = ord_cell;
+if sort_tr
     ens_out.trials.dend_order = ord_tr;
 end
+
 %%
 if plot_stuff
     f_plot_raster_mean(firing_rate, 1)

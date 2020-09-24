@@ -10,8 +10,6 @@ hcluster_distance_metric = f_get_param(params, 'hcluster_distance_metric', 'cosi
 
 plot_stuff = f_get_param(params, 'plot_stuff', 0);
 
-fprintf('Detecting ensembles with %s and clust_cell detection...\n',ensamble_method);
-
 [num_cells, num_clust] = size(coeffs);
 
 % if ~strcmpi(params.hcluster_distance_metric, 'cosine')
@@ -148,16 +146,16 @@ clust_out_cell_full2.ens_scores = ens_scores;
 clust_out.cells = clust_out_cell_full2;
 clust_out.trials.ens_list = ens_fames;
 
-for n_cl = 1:num_clust
-    ens_raster = raster_norm(clust_out_cell_full2.clust_ident == n_cl,:);
-    figure;
-    subplot(2,1,1);
-    imagesc(ens_raster);
-    title(['clust ' num2str(n_cl)])
-    subplot(2,1,2); hold on;
-    plot(ens_scores(n_cl,:)); axis tight;
-    plot(ones(num_frames,1)*3*std(ens_scores(n_cl,:)), '--r')
-end
+% for n_cl = 1:num_clust
+%     ens_raster = raster_norm(clust_out_cell_full2.clust_ident == n_cl,:);
+%     figure;
+%     subplot(2,1,1);
+%     imagesc(ens_raster);
+%     title(['clust ' num2str(n_cl)])
+%     subplot(2,1,2); hold on;
+%     plot(ens_scores(n_cl,:)); axis tight;
+%     plot(ones(num_frames,1)*3*std(ens_scores(n_cl,:)), '--r')
+% end
 
 
 end
