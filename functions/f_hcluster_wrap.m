@@ -4,8 +4,8 @@ function hclust_out = f_hcluster_wrap(X, params)
 
 num_clust = f_get_param(params, 'num_clust');
 estimate_clust_num = f_get_param(params, 'estimate_clust_num', 0);
-method = f_get_param(params, 'method', 'cosine');
-metric = f_get_param(params, 'metric', 'cosine');
+method = f_get_param(params, 'method', 'average'); % ward(inner square), average, single(shortest)
+distance_metric = f_get_param(params, 'distance_metric', 'cosine'); % none, euclidean, squaredeuclidean, cosine, hammilarity
 sp = f_get_param(params, 'subplot_ptr');
 plot_dist_mat = f_get_param(params, 'plot_dist_mat', 1);
 plot_clusters = f_get_param(params, 'plot_clusters', 1);
@@ -13,25 +13,36 @@ XY_label = f_get_param(params, 'XY_label');
 title_tag = f_get_param(params, 'title_tag');
 sample_types = f_get_param(params, 'sample_types');
 sample_types_colors = f_get_param(params, 'sample_types_colors');
+clim = f_get_param(params, 'clim');
 
 if isempty(num_clust)
     num_clust = 1;
 end
 
+if strcmpi(distance_metric, 'none')
+    X_clust = X;
+else
+    X_clust = f_pdist_YS(X, distance_metric);
+end
+
 % warning is because some trial bins are nearly zero
-[dend_order, clust_ident, Z] = f_hcluster(X, method, num_clust);
+[dend_order, clust_ident, Z] = f_hcluster(X_clust, method, num_clust);
 
 %f_plot_comp_scatter(trial_peaks, clust_ident)
 
-%figure; imagesc(color_seq_temporal)
-
-dist1 = f_pdist_YS(X(dend_order,:), metric);
+if strcmpi(distance_metric, 'none')
+    dist1 = f_pdist_YS(X(dend_order,:), 'euclidean');
+    plot_metric_tag = 'none (plot euclidean)';
+else
+    dist1 = X_clust(dend_order,dend_order);
+    plot_metric_tag = distance_metric;
+end
 
 if estimate_clust_num
     est_params.num_shuff = 5;
     est_params.clust_range = 1:5;
     est_params.method = method;
-    est_params.metric = metric;
+    est_params.metric = distance_metric;
     est_params.manual_cluster_input = 0;
     est_params.plot_stuff = 1;
     est_params.title_tag = title_tag;
@@ -53,10 +64,13 @@ if plot_dist_mat
     end
     imagesc(image_Z);
     %axis image;
-    title(sprintf('%s %s hclust, %s dist',  title_tag, method, metric));
-    caxis([0 1]);
+    title(sprintf('%s hclust; method: %s; dist metric: %s',  title_tag, method, plot_metric_tag));
+    if ~isempty(clim)
+        caxis(clim);
+    end
     axis tight;
     axis equal;
+    colorbar
     if ~isempty(XY_label)
         xlabel(XY_label);
         ylabel(XY_label);

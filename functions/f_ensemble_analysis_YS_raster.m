@@ -14,6 +14,13 @@ plot_stuff = f_get_param(params, 'plot_stuff');
 
 num_comp = f_get_param(params, 'num_comp');
 
+if ~strcmpi(ensamble_method, 'nmf') && strcmpi(ensamble_extraction, 'thresh')
+    fprintf('Thresh detection is only for nmf dummy...\n');
+    ensamble_extraction = 'clust';
+end
+
+fprintf('Detecting ensembles with %s and thresh detection...\n',ensamble_method);
+
 %%
 ndims1 = ndims(firing_rate);
 if ndims1 == 3
@@ -46,40 +53,40 @@ d_explained2 = sing_val_sq2/sum(sing_val_sq2)*100;
 %figure; plot(d_explained)
 dimensionality_total = sum(cumsum(d_explained2)<(total_dim_thresh*100));
 
-%% shuff and PCA
-num_reps = 50;
-max_lamb_shuff = zeros(num_reps,1);
-dim_total_shuff = zeros(num_reps,1);
-for n_rep = 1:num_reps
-    firing_rate_shuff = f_shuffle_data(firing_rate_norm, shuffle_method);
-%     [~,s_S,~] = svd(firing_rate_shuff);
-%     s_sing_val_sq = diag(s_S'*s_S);
-%     s_explained = s_sing_val_sq/sum(s_sing_val_sq)*100;
-    [~,~,~,~,s_explained,~] = pca(firing_rate_shuff');
-
-    dim_total_shuff(n_rep) = sum(cumsum(s_explained)<(total_dim_thresh*100));
-    max_lamb_shuff(n_rep) = max(s_explained);
-end
-dimensionality_total_norm_shuff = mean(dim_total_shuff);
-% eigenvalues below lower bound plus above upper should
-% theoretically equal total number of neurons in all ensembles
-%dimensionality_corr = sum(d_explained>prctile(max_lamb_shuff, corr_comp_thresh*100));
-
-dimensionality_corr = mean(sum(d_explained>max_lamb_shuff'));
-
-if isempty(num_comp)
-    num_comp = ceil(dimensionality_corr);
-end
 
 ens_out.dimensionality_total = dimensionality_total;
-ens_out.dimensionality_first_comp_size = d_explained2(1);
 ens_out.dimensionality_total_norm = dimensionality_total_norm;
-ens_out.dimensionality_total_norm_shuff = dimensionality_total_norm_shuff;
-ens_out.dimensionality_corr = dimensionality_corr;
-ens_out.num_comps = num_comp;
+ens_out.dimensionality_first_comp_size = d_explained2(1);
 ens_out.d_explained = d_explained(1:num_comp);
-%data_dim_est.corr_comp_thresh = corr_comp_thresh;
-ens_out.num_cells = num_cells;
+
+%% shuff and PCA
+if isempty(num_comp)
+    fprintf('Estimating dimensionality...\n');
+    num_reps = 50;
+    max_lamb_shuff = zeros(num_reps,1);
+    dim_total_shuff = zeros(num_reps,1);
+    for n_rep = 1:num_reps
+        firing_rate_shuff = f_shuffle_data(firing_rate_norm, shuffle_method);
+    %     [~,s_S,~] = svd(firing_rate_shuff);
+    %     s_sing_val_sq = diag(s_S'*s_S);
+    %     s_explained = s_sing_val_sq/sum(s_sing_val_sq)*100;
+        [~,~,~,~,s_explained,~] = pca(firing_rate_shuff');
+
+        dim_total_shuff(n_rep) = sum(cumsum(s_explained)<(total_dim_thresh*100));
+        max_lamb_shuff(n_rep) = max(s_explained);
+    end
+    dimensionality_total_norm_shuff = mean(dim_total_shuff);
+    % eigenvalues below lower bound plus above upper should
+    % theoretically equal total number of neurons in all ensembles
+    %dimensionality_corr = sum(d_explained>prctile(max_lamb_shuff, corr_comp_thresh*100));
+
+    dimensionality_corr = mean(sum(d_explained>max_lamb_shuff'));
+    num_comp = ceil(dimensionality_corr);
+    
+    ens_out.dimensionality_total_norm_shuff = dimensionality_total_norm_shuff;
+    ens_out.dimensionality_corr = dimensionality_corr;
+end
+ens_out.num_comps = num_comp;
 
 %%
 %SI_firing_rate = similarity_index(firing_rate_norm, firing_rate_norm);
@@ -95,22 +102,26 @@ d_score_norm = d_score(:,n_comp)./vecnorm(d_score(:,n_comp));
 
 
 %% sort cells and trials
-hc_params.method = 'cosine';
-hc_params.metric = 'cosine';
+hc_params.method = params.hcluster_method;
+hc_params.distance_metric = params.hcluster_distance_metric;
 hc_params.plot_dist_mat = plot_stuff;
 hc_params.plot_clusters = plot_stuff;
 hc_params.num_clust = num_comp+1;
-hc_params.title_tag = 'Scores (trials)';
-hclust_out_tr = f_hcluster_wrap(d_score_norm, hc_params);
 hc_params.title_tag = 'Coeffs (cells)';
 hclust_out_cell = f_hcluster_wrap(d_coeff(:,n_comp), hc_params);
 ord_cell = hclust_out_cell.dend_order;
-ord_tr = hclust_out_tr.dend_order;
 ens_out.ord_cell = ord_cell;
-ens_out.ord_tr = ord_tr;
 
+sort_tr = 0;
+if sort_tr
+    hc_params.title_tag = 'Scores (trials)';
+    hclust_out_tr = f_hcluster_wrap(d_score_norm, hc_params);
+    ord_tr = hclust_out_tr.dend_order;
+    ens_out.ord_tr = ord_tr;
+end
 %% real data 
 if num_comp > 0
+    fprintf('Dim reduction with %s, %d comps...\n', ensamble_method, num_comp);
     num_ens_comps = num_comp;
     firing_rate_ensemb = firing_rate_norm;
     
@@ -125,12 +136,11 @@ if num_comp > 0
     %%
 
     if strcmpi(ensamble_extraction, 'clust')
-        ens_out1 = f_ensemble_extract_clust(coeffs, scores, num_ens_comps, firing_rate_norm, params);
+        ens_out1 = f_ensemble_clust_cell(coeffs, scores, firing_rate_norm, params);
+        %ens_out1 = f_ensemble_extract_clust(coeffs, scores, num_ens_comps, firing_rate_norm, params);
     elseif strcmpi(ensamble_extraction, 'thresh')
         [thresh_coeffs, thresh_scores] = f_ens_get_thresh(firing_rate_ensemb, coeffs, scores, num_ens_comps, params);
         ens_out1 = f_ensemble_apply_thresh(coeffs, scores, thresh_coeffs, thresh_scores, num_ens_comps);
-    elseif strcmpi(ensamble_extraction, 'clust_cell')
-        ens_out1 = f_ensemble_clust_cell(coeffs, scores, num_ens_comps, firing_rate_norm, params);
     end
     ens_out.cells = ens_out1.cells;
     ens_out.trials = ens_out1.trials;
@@ -151,17 +161,22 @@ if plot_stuff
 
     f_plot_raster_mean(firing_rate(ord_cell,:),1)
     title('raster cell sort')
-
-    f_plot_raster_mean(firing_rate_norm(ord_cell,ord_tr), 1)
-    title('raster cell trial sort')
-    
-    f_plot_raster_mean(firing_rate_LR(ord_cell,ord_tr), 1)
-    title('raster SVD LR cell trial sort')
     
     n_comp = 1:num_ens_comps;
     firing_rate_LR2 = coeffs(:,n_comp)*scores(n_comp,:);
-    f_plot_raster_mean(firing_rate_LR2(ord_cell,ord_tr), 1)
-    title(['raster ' ensamble_method ' LR2 cell trial sort'])
+    f_plot_raster_mean(firing_rate_LR2(ord_cell,:), 1)
+    title(['raster ' ensamble_method ' LR2 cell sort'])
+        
+    if sort_tr
+        f_plot_raster_mean(firing_rate_norm(ord_cell,ord_tr), 1)
+        title('raster cell trial sort')
+
+        f_plot_raster_mean(firing_rate_LR(ord_cell,ord_tr), 1)
+        title('raster SVD LR cell trial sort')
+
+        f_plot_raster_mean(firing_rate_LR2(ord_cell,ord_tr), 1)
+        title(['raster ' ensamble_method ' LR2 cell trial sort'])
+    end
 end
 
 

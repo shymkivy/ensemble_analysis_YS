@@ -44,8 +44,6 @@ train_err = zeros(kFold,1);
 train_err_sm = zeros(kFold,1);
 test_err = zeros(kFold,1);
 test_err_sm = zeros(kFold,1);
-fac = zeros(kFold,1);
-fac_sm = zeros(kFold,1);
 for n_cv = 1:kFold
     test_gr = cv_groups.test_trial_bool(test_order,n_cv);
     

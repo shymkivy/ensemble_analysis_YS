@@ -26,15 +26,21 @@ est_params_list = f_build_param_list(est_params, {'smooth_SD', 'num_comp', 'n_re
 % NMF ensemble detection is best with thresh extraction
 % for NMF best to use norm_rms(keep values positive), otherwise can also use norm_mean_std
 
-ens_params.ensamble_method = 'nmf'; % options: svd, nmf, ica     % here NMF is
+ens_params.ensamble_method = 'nmf'; % options: svd, **nmf**, ica     % here NMF is
 ens_params.num_comp = 15;
 ens_params.smooth_SD = 120; % 110 is better?
 ens_params.normalize = 'norm_mean_std'; % 'norm_mean_std', 'norm_mean' 'none'
-ens_params.ensamble_extraction = 'thresh'; %  'thresh'(for nmf) 'clust'(for svd)
+ens_params.ensamble_extraction = 'thresh'; %  **'thresh'(only for nmf)** 'clust'(for all)
+% --- for thresh detection (only nmf)
 ens_params.ensamble_extraction_thresh = 'signal_z'; % 'shuff' 'signal_z' 'signal_clust_thresh'
 ens_params.signal_z_thresh = 2.5;
 ens_params.shuff_thresh_percent = 95;
-ens_params.plot_stuff = 1;
+% --- for clust detection and general sorting 
+ens_params.hcluster_method = 'average';  % ward(inner square), **average**, single(shortest)     
+ens_params.hcluster_distance_metric = 'cosine';  % none, euclidean, squaredeuclidean, **cosine**, hammilarity, rbf% for low component number better euclidean, otherwise use cosine
+ens_params.corr_cell_thresh_percent = 95;   % to remove cells with no significant correlations
+% --- other
+ens_params.plot_stuff = 0;
 
 %% remove inactive cells
 
@@ -78,13 +84,21 @@ firing_rate_sm = f_smooth_gauss(firing_rate, ens_params.smooth_SD*frame_rate/100
 disp('Extracting ensambles...');
 ens_out = f_ensemble_analysis_YS_raster(firing_rate_sm, ens_params);
 
+%% plotting stuff
 f_plot_raster_mean(firing_rate_sm(ens_out.ord_cell,:), 1);
 title('raster cell sorted');
 
 for n_comp = 1:numel(ens_out.cells.ens_list)
     cells1 = ens_out.cells.ens_list{n_comp};
     trials1 = ens_out.trials.ens_list{n_comp};
-    scores1 = ens_out.scores(n_comp,:);
+    if strcmpi(ens_params.ensamble_extraction, 'thresh')
+        scores1 = ens_out.scores(n_comp,:);
+    else
+        scores1 = ens_out.coeffs(cells1,:)*ens_out.scores;
+        if numel(cells1) > 1
+            scores1 = mean(scores1);
+        end
+    end
 
     f_plot_ensamble_deets(firing_rate_sm, cells1, trials1, scores1);
     title([ens_params.ensamble_method ' ensamble ' num2str(n_comp)]);
