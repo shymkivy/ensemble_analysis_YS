@@ -3,11 +3,8 @@
 clear;
 close all;
 
-% laod1 = load('firing_rates_cont_A1_dset1_ammn.mat');
-% firing_rate = laod1.firing_rate;
-
-laod1 = load('Raster_Norm_slice.mat');
-firing_rate = laod1.Raster_Norm;
+laod1 = load('firing_rates_cont_A1_dset1_ammn.mat');
+firing_rate = laod1.firing_rate;
 
 addpath([pwd '\functions\'])
 %% cell - cell similarity
