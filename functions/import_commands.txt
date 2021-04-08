@@ -17,6 +17,7 @@ curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_ensemble_analysis_YS_raster.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_hcluster_wrap.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_hcluster.m
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_estimate_clust_num.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_trial_indicator.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_gmmcluster_trial.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_evaluate_ens_result.m
@@ -32,5 +33,6 @@ curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_align_comps_square.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_comp_scatter.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_get_clust_params.m
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_evaluate_ens_cv.m
 
 ECHO Done
