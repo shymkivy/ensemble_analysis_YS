@@ -1,4 +1,4 @@
-# run in cmd with ./import_commands.txt
+# run in git bash with ./import_commands.txt
 
 
 ECHO Downloading.....
