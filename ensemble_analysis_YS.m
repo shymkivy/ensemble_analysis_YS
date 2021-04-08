@@ -8,6 +8,7 @@ laod1 = load('firing_rates_cont_A1_dset1_ammn.mat');
 firing_rate = laod1.firing_rate;
 frame_rate = 30;
 
+addpath([pwd '\functions\'])
 %% input parameters for cross validation estimation of smooth window and number of correlated components / ensembles
 % **params** are best params
 

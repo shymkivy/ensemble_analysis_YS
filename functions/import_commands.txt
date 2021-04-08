@@ -1,6 +1,5 @@
 # run in git bash with ./import_commands.txt
 
-
 ECHO Downloading.....
 
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/general_functions/f_smooth_gauss.m
@@ -34,5 +33,5 @@ curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_comp_scatter.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_get_clust_params.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_evaluate_ens_cv.m
-
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_build_param_list.m
 ECHO Done
