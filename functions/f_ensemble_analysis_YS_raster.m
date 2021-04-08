@@ -19,7 +19,7 @@ if ~strcmpi(ensamble_method, 'nmf') && strcmpi(ensamble_extraction, 'thresh')
     ensamble_extraction = 'clust';
 end
 
-fprintf('Detecting ensembles with %s and %s detection...\n',ensamble_method, ensamble_extraction);
+fprintf('Detecting ensembles with %s and %s...\n',ensamble_method, ensamble_extraction);
 
 %%
 ndims1 = ndims(firing_rate);

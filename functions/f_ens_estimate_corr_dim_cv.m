@@ -1,4 +1,5 @@
 function accuracy = f_ens_estimate_corr_dim_cv(firing_rate, params)
+% estimate dimensionality of correlations with a cross-validation method
 if ~exist('params', 'var') || ~isstruct(params)
     params = struct;
 end
@@ -7,13 +8,13 @@ shuffle_data_chunks = f_get_param(params, 'shuffle_data_chunks', 1);
 num_comp = f_get_param(params, 'num_comp');
 ensamble_method = f_get_param(params, 'ensamble_method', 'SVD');
 smooth_SD = f_get_param(params, 'smooth_SD', 'SVD');
-vol_period = f_get_param(params, 'vol_period', 30);
+vol_period = f_get_param(params, 'vol_period', 33);
 
 [~, num_bins] = size(firing_rate);
 
 cv_groups = f_make_crossval_groups(num_bins, kFold);
 
-% get somponents to explain 25%
+% get components to explain 25%
 if isempty(num_comp)
     [~,~,~,~,explained,~] = pca(firing_rate);
     num_comp = sum(cumsum(explained) < 10);
@@ -66,7 +67,7 @@ for n_cv = 1:kFold
 %     Ycs_base = Ycs - mean(Ycs,2);
     
     %fac1 = sum(yTest_base(:) .* Ycs_base(:)/norm(Ycs_base(:)))/norm(Ycs_base(:));
-    test_err(n_cv) = norm(yTest(:) - Ycs(:))/norm(yTest(:));
+    test_err(n_cv) = norm(yTest(:) - Ycs(:))/norm(ones(size(yTest,1),1));% norm(ones(size(yTest,1),1)); % norm(yTest(:));
     %fac(n_cv) = fac1;
     
     %fac1 = sum(yTest_sm_base(:) .* Ycs_base(:)/norm(Ycs_base(:)))/norm(Ycs_base(:));

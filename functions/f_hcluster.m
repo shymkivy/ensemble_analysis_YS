@@ -4,7 +4,6 @@ Z = linkage(data,method);
 
 dend_order =  binOrd(Z)';
 
-
 if exist('num_clust', 'var')
     clust_ident = cluster(Z, 'MaxClust', num_clust);
 else
