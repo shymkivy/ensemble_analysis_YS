@@ -9,10 +9,11 @@ firing_rate = laod1.firing_rate;
 frame_rate = 30;
 
 %% input parameters for cross validation estimation of smooth window and number of correlated components / ensembles
+% **params** are best params
 
 estimate_params = 0;    % do estimation?
 est_params.ensamble_method = 'nmf';              % options: svd, nmf, ica                % SVD is most optimal for encoding, NMF rotates components into something that is real and interpretable
-est_params.normalize = 'norm_mean_std'; % 'norm_mean_std', 'norm_mean' 'none'   % either way, need to normalize the power of signal in each cell, otherwise dimred will pull out individual cells
+est_params.normalize = 'norm_mean_std'; % **'norm_mean_std'**, 'norm_mean' 'none'   % either way, need to normalize the power of signal in each cell, otherwise dimred will pull out individual cells
 est_params.smooth_SD = 50:50:250;       % range of values to estimate across    % larger window will capture 'sequences' of ensembles, if window is smaller than optimal, you will end up splitting those into more components
 est_params.num_comp = 2:4:20;               % range of values to estimate across    
 est_params.shuffle_data_chunks = 0;   % 1 or 0, keeping cell correlations   % if the sequence of trial presentation contains information, you will need to shuffle. Also need to do in chunks because adjacent time bins are slightly correlated
