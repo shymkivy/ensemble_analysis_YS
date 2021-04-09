@@ -37,7 +37,7 @@ elseif numel_y == 1
     xlabel(x_var, 'interpreter', 'none');
     ylabel(z_var, 'interpreter', 'none');
 else
-    surf(squeeze(grid_x(:,:,1)), squeeze(grid_y(:,:,1)), mean(grid_z,3))
+    p1 = surf(squeeze(grid_x(:,:,1)), squeeze(grid_y(:,:,1)), mean(grid_z,3));
     xlabel(x_var, 'interpreter', 'none');
     ylabel(y_var, 'interpreter', 'none');
     zlabel(z_var, 'interpreter', 'none');
@@ -81,7 +81,7 @@ if ~isempty(data_s)
         xlabel(x_var, 'interpreter', 'none');
         ylabel(z_var, 'interpreter', 'none');
     else
-        surf(squeeze(grid_x(:,:,1)), squeeze(grid_y(:,:,1)), mean(grid_z,3))
+        p2 = surf(squeeze(grid_x(:,:,1)), squeeze(grid_y(:,:,1)), mean(grid_z,3));
         xlabel(x_var, 'interpreter', 'none');
         ylabel(y_var, 'interpreter', 'none');
         zlabel(z_var, 'interpreter', 'none');
