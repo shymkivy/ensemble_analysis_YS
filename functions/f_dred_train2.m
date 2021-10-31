@@ -38,6 +38,13 @@ if strcmpi(method, 'svd')
     dred_data = coeffs * scores+data_means;
     dred_factors.scores = scores;
     dred_factors.coeffs = coeffs;
+elseif strcmpi(method, 'pca')
+    [coeffs,scores,~,~,~,mu] = pca(data_n2d');
+    coeffs2 = coeffs(:,1:num_comp);
+    scores2 = scores(:,1:num_comp)';
+    dred_data = (coeffs2 * scores2) +mu'+data_means;
+    dred_factors.scores = scores2;
+    dred_factors.coeffs = coeffs2;
 elseif strcmpi(method, 'nmf')
     data_means = zeros(num_cells,1);
     [d_W,d_H] = nnmf(data_2d,num_comp,'options',statset('Display','off'),'replicates',1,'algorithm','als');

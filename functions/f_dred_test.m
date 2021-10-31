@@ -6,7 +6,7 @@ data_2d = reshape(data_3d, num_cells, []);
 %%
 Ycs = zeros(size(data_2d)); 
 d = dred_factors.means;
-if strcmpi(method, 'svd')
+if strcmpi(method, 'svd') || strcmpi(method, 'pca')
     L = dred_factors.coeffs;
     for n_cell = 1:num_cells  
         % Indices 1:yDim with i removed

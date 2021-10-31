@@ -6,11 +6,13 @@ end
 kFold = f_get_param(params, 'KFold', 5);
 shuffle_data_chunks = f_get_param(params, 'shuffle_data_chunks', 1);
 num_comp = f_get_param(params, 'num_comp');
-ensamble_method = f_get_param(params, 'ensamble_method', 'SVD');
-smooth_SD = f_get_param(params, 'smooth_SD', 'SVD');
-vol_period = f_get_param(params, 'vol_period', 33);
+ensamble_method = f_get_param(params, 'ensamble_method', 'pca');
+smooth_SD = f_get_param(params, 'smooth_SD', 100);
+vol_period = f_get_param(params, 'vol_period', 1000/30);
 
-[~, num_bins] = size(firing_rate);
+renormalize = 1;
+
+[num_cells, num_bins] = size(firing_rate);
 
 cv_groups = f_make_crossval_groups(num_bins, kFold);
 
@@ -41,10 +43,16 @@ end
 
 firing_rate_sm = f_smooth_gauss(firing_rate, smooth_SD/vol_period);
 
+if renormalize
+    firing_rate_sm = f_normalize(firing_rate_sm, 'norm_mean_std');
+end
+
 train_err = zeros(kFold,1);
 train_err_sm = zeros(kFold,1);
 test_err = zeros(kFold,1);
 test_err_sm = zeros(kFold,1);
+test_norm = zeros(kFold,1);
+test_norm_sm = zeros(kFold,1);
 for n_cv = 1:kFold
     test_gr = cv_groups.test_trial_bool(test_order,n_cv);
     
@@ -58,7 +66,8 @@ for n_cv = 1:kFold
     
     yTest = firing_rate(:,test_gr);
     yTest_sm = firing_rate_sm(:,test_gr);
-    Ycs = f_dred_test(yTest_sm, dred_factors.dred_factors, ensamble_method);
+    % reconstruct from not smooth data, but smooth is similar it seems
+    Ycs = f_dred_test(yTest, dred_factors.dred_factors, ensamble_method); % _sm
     %test_err(n_cv) = norm(yTest(:) - Ycs(:))/norm(yTest(:));
     %test_err_sm(n_cv) = norm(yTest_sm(:) - Ycs(:))/norm(yTest_sm(:));
      
@@ -67,16 +76,27 @@ for n_cv = 1:kFold
 %     Ycs_base = Ycs - mean(Ycs,2);
     
     %fac1 = sum(yTest_base(:) .* Ycs_base(:)/norm(Ycs_base(:)))/norm(Ycs_base(:));
-    test_err(n_cv) = norm(yTest(:) - Ycs(:))/norm(ones(size(yTest,1),1));% norm(ones(size(yTest,1),1)); % norm(yTest(:));
+    
+    % normalized error, so cell number doesnt matter.. if data not
+    % normalized after smoothing, error will not be flat
+    test_err(n_cv) = norm(yTest(:) - Ycs(:))/norm(ones(num_cells,1));% norm(ones(size(yTest,1),1)); % norm(yTest(:));
     %fac(n_cv) = fac1;
     
     %fac1 = sum(yTest_sm_base(:) .* Ycs_base(:)/norm(Ycs_base(:)))/norm(Ycs_base(:));
-    test_err_sm(n_cv) = norm(yTest_sm(:) - Ycs(:))/numel(yTest_sm);
+    %test_err_sm(n_cv) = norm(yTest_sm(:) - Ycs(:))/numel(yTest_sm);
+    test_err_sm(n_cv) = norm(yTest_sm(:) - Ycs(:))/norm(ones(num_cells,1));
     %fac_sm(n_cv) = fac1;
+    
+    test_norm(n_cv) = norm(yTest(:))/norm(ones(num_cells,1));
+    
+    test_norm_sm(n_cv) = norm(yTest_sm(:))/norm(ones(num_cells,1));
 end
+
 
 accuracy.train_err = nanmean(train_err);
 accuracy.train_err_sm = nanmean(train_err_sm);
 accuracy.test_err = nanmean(test_err);
 accuracy.test_err_sm = nanmean(test_err_sm);
+accuracy.test_norm = mean(test_norm);
+accuracy.test_norm_sm = mean(test_norm_sm);
 end

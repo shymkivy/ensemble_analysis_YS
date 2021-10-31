@@ -1,4 +1,4 @@
-function f_plot_cv_error_3D(data, data_s, x_var, y_var, z_var)
+function fig1 = f_plot_cv_error_3D(data, data_s, x_var, y_var, z_var)
 
 data_x = [data.(x_var)];
 data_y = [data.(y_var)];
@@ -21,7 +21,7 @@ grid_x = reshape(data_all2(:,1), [numel_x, numel_y, numel_rep]);
 grid_y = reshape(data_all2(:,2), [numel_x, numel_y, numel_rep]);
 grid_z = reshape(data_all2(:,4), [numel_x, numel_y, numel_rep]);
 
-figure; hold on;
+fig1 = figure; hold on;
 if numel_x == 1
     p1 = plot(squeeze(grid_y(:,:,1)), mean(grid_z,3), 'b', 'LineWidth', 2);
     if numel_rep > 1
@@ -87,8 +87,11 @@ if ~isempty(data_s)
         zlabel(z_var, 'interpreter', 'none');
     end
     title(z_var, 'interpreter', 'none') 
+    legend([p1 p2], {'data', 'shuff'})
+else
+    legend([p1], {'data'})
 end
 
-legend([p1 p2], {'data', 'shuff'})
+
 
 end
