@@ -11,13 +11,13 @@ curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/general
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/general_functions/shadedErrorBar_YS.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/general_functions/shadedErrorBar.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/general_functions/similarity_index.m
+curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/general_functions/f_hcluster_wrap.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_ens_estimate_corr_dim_cv.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_make_crossval_groups.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_dred_train2.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_dred_test.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_cv_error_3D.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_ensemble_analysis_YS_raster.m
-curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_hcluster_wrap.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_hcluster.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_estimate_clust_num.m
 curl -O https://raw.githubusercontent.com/shymkivy/AC_2p_analysis/master/s3_mpl_functions/f_plot_trial_indicator.m
